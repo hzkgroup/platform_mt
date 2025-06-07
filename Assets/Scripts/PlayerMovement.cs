@@ -3,13 +3,13 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
-    public float jumpForce = 10f;
+    public float jumpForce = 2f;
     public Transform groundCheck;
-    public float groundCheckRadius = 0.2f;
+    public float groundCheckRadius = 0.5f;
     public LayerMask groundLayer;
 
     private Rigidbody2D rb;
-    private bool isGrounded;
+    public bool isGrounded = true;
 
     void Awake()
     {
@@ -18,17 +18,21 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        // Движение по горизонтали
         float moveInput = Input.GetAxisRaw("Horizontal");
-        rb.linearVelocity = new Vector2(moveInput * moveSpeed, rb.linearVelocity.y);
-
-        // Проверка на землю
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayer);
-
-        // Прыжок
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
+        
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            rb.velocity = new Vector2(rb.velocity.x, jumpForce);
+            isGrounded = false;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D obj)
+    {
+        if(obj.gameObject.CompareTag("Ground"))
+        {
+            isGrounded = true;
         }
     }
 }
