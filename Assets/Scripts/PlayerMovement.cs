@@ -10,6 +10,7 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     public bool isGrounded = true;
+    private bool facingRight = true;
 
     void Awake()
     {
@@ -20,17 +21,35 @@ public class PlayerMovement : MonoBehaviour
     {
         float moveInput = Input.GetAxisRaw("Horizontal");
         rb.velocity = new Vector2(moveInput * moveSpeed, rb.velocity.y);
-        
+
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.velocity = new Vector2(rb.velocity.x, jumpForce);
             isGrounded = false;
         }
+
+        // Флип по горизонтали
+        if (moveInput > 0 && !facingRight)
+        {
+            Flip();
+        }
+        else if (moveInput < 0 && facingRight)
+        {
+            Flip();
+        }
+    }
+
+    void Flip()
+    {
+        facingRight = !facingRight;
+        Vector3 scale = transform.localScale;
+        scale.x *= -1;
+        transform.localScale = scale;
     }
 
     void OnCollisionEnter2D(Collision2D obj)
     {
-        if(obj.gameObject.CompareTag("Ground"))
+        if (obj.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
         }
